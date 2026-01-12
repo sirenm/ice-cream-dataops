@@ -61,5 +61,11 @@ jobs:
         run: yes | cdf auth verify
       - name: Build Toolkit Configurations
         run: cdf build --env=${{ matrix.environment }}
+      
+      - name: Debug – confirm prod source external IDs
+        run: |
+          echo "ICAPI_EXTRACTORS_SOURCE_ID=${ICAPI_EXTRACTORS_SOURCE_ID}"
+          echo "DATA_PIPELINE_OEE_SOURCE_ID=${DATA_PIPELINE_OEE_SOURCE_ID}"
+
       - name: Deploy Toolkit Configurations
         run: cdf deploy --env=${{ matrix.environment }}
