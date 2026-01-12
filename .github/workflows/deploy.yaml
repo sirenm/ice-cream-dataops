@@ -63,27 +63,36 @@ jobs:
         run: cdf build --env=${{ matrix.environment }}
       
       
-      - name: Debug – show rendered hosted extractor jobs
+      
+      - name: Debug – enumerate build output and show job files
         run: |
-          echo "Searching for rendered jobs under build output..."
-          # Common Toolkit build output locations:
-          #   build/<env>/hosted_extractors/jobs/*
-          #   .cdf-tk-build/<env>/hosted_extractors/jobs/*
-          # We search both to be safe.
-          FOUND=0
-          for ROOT in build .cdf-tk-build; do
-            if [ -d "$ROOT" ]; then
-              echo "== Listing $ROOT =="
-              find "$ROOT" -type f -path "*/hosted_extractors/jobs/*" -print -exec sed -n '1,200p' {} \;
-              FOUND=1
+          echo "== Tree of build/ =="
+          find build -type d -print | sed -n '1,200p'
+          echo ""
+          echo "== Files under build/ =="
+          find build -type f -print | sed -n '1,400p'
+
+          echo ""
+          echo "== Try to print hosted extractor job files =="
+          # Common patterns: yaml/json in hosted_extractors/jobs
+          for f in $(find build -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \)); do
+            case "$f" in
+              *hosted_extractors*/jobs/*)
+                echo "----- $f -----"
+                sed -n '1,200p' "$f"
+              ;;
+            esac
+          done
+
+          echo ""
+          echo "== If nothing matched, show any files mentioning 'source' fields =="
+          for f in $(find build -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \)); do
+            if grep -qiE 'source|dataSourceExternalId' "$f"; then
+              echo "----- $f -----"
+              sed -n '1,200p' "$f"
             fi
           done
-          if [ "$FOUND" -eq 0 ]; then
-            echo "❌ No build output directories found (build/ or .cdf-tk-build/)."
-            echo "If build output path differs, we need to list the workspace to locate it:"
-            ls -la
-            exit 1
-          fi
+
 
 
       - name: Deploy Toolkit Configurations
