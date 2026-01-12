@@ -53,47 +53,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Ignore .env in CI
-        run: rm -f .env || true
-
       - name: Verify and Update Toolkit Authorization
         run: yes | cdf auth verify
       - name: Build Toolkit Configurations
         run: cdf build --env=${{ matrix.environment }}
-      
-      
-      
-      - name: Debug – enumerate build output and show job files
-        run: |
-          echo "== Tree of build/ =="
-          find build -type d -print | sed -n '1,200p'
-          echo ""
-          echo "== Files under build/ =="
-          find build -type f -print | sed -n '1,400p'
-
-          echo ""
-          echo "== Try to print hosted extractor job files =="
-          # Common patterns: yaml/json in hosted_extractors/jobs
-          for f in $(find build -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \)); do
-            case "$f" in
-              *hosted_extractors*/jobs/*)
-                echo "----- $f -----"
-                sed -n '1,200p' "$f"
-              ;;
-            esac
-          done
-
-          echo ""
-          echo "== If nothing matched, show any files mentioning 'source' fields =="
-          for f in $(find build -type f \( -name "*.yaml" -o -name "*.yml" -o -name "*.json" \)); do
-            if grep -qiE 'source|dataSourceExternalId' "$f"; then
-              echo "----- $f -----"
-              sed -n '1,200p' "$f"
-            fi
-          done
-
-
-
       - name: Deploy Toolkit Configurations
         run: cdf deploy --env=${{ matrix.environment }}
