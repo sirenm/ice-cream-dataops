@@ -53,12 +53,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Debug environment (safe)
-        run: |
-          echo "IDP_CLIENT_ID is set: ${{ env.IDP_CLIENT_ID != '' }}"
-          echo "IDP_CLIENT_SECRET is set: ${{ env.IDP_CLIENT_SECRET != '' }}"
-
       - name: Verify and Update Toolkit Authorization
         run: yes | cdf auth verify
       - name: Build Toolkit Configurations
