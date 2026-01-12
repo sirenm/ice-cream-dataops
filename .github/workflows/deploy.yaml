@@ -62,10 +62,29 @@ jobs:
       - name: Build Toolkit Configurations
         run: cdf build --env=${{ matrix.environment }}
       
-      - name: Debug – confirm prod source external IDs
+      
+      - name: Debug – show rendered hosted extractor jobs
         run: |
-          echo "ICAPI_EXTRACTORS_SOURCE_ID=${ICAPI_EXTRACTORS_SOURCE_ID}"
-          echo "DATA_PIPELINE_OEE_SOURCE_ID=${DATA_PIPELINE_OEE_SOURCE_ID}"
+          echo "Searching for rendered jobs under build output..."
+          # Common Toolkit build output locations:
+          #   build/<env>/hosted_extractors/jobs/*
+          #   .cdf-tk-build/<env>/hosted_extractors/jobs/*
+          # We search both to be safe.
+          FOUND=0
+          for ROOT in build .cdf-tk-build; do
+            if [ -d "$ROOT" ]; then
+              echo "== Listing $ROOT =="
+              find "$ROOT" -type f -path "*/hosted_extractors/jobs/*" -print -exec sed -n '1,200p' {} \;
+              FOUND=1
+            fi
+          done
+          if [ "$FOUND" -eq 0 ]; then
+            echo "❌ No build output directories found (build/ or .cdf-tk-build/)."
+            echo "If build output path differs, we need to list the workspace to locate it:"
+            ls -la
+            exit 1
+          fi
+
 
       - name: Deploy Toolkit Configurations
         run: cdf deploy --env=${{ matrix.environment }}
