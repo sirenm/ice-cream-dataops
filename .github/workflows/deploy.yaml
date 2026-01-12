@@ -55,22 +55,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify and Update Toolkit Authorization
         run: yes | cdf auth verify
-      
-      - name: Debug – verify env config file
-        run: |
-          echo "ENV being built: ${{ matrix.environment }}"
-          CONFIG_PATH="ice-cream-dataops/config.${{ matrix.environment }}.yaml"
-          echo "Expecting config at: $CONFIG_PATH"
-          if [ -f "$CONFIG_PATH" ]; then
-            echo "✅ Found $CONFIG_PATH. Showing first 200 lines:"
-            sed -n '1,200p' "$CONFIG_PATH"
-          else
-            echo "❌ Missing $CONFIG_PATH"
-            echo "Listing ice-cream-dataops/ directory:"
-            ls -la ice-cream-dataops || true
-            exit 1
-          fi
-
       - name: Build Toolkit Configurations
         run: cdf build --env=${{ matrix.environment }}
       - name: Deploy Toolkit Configurations
