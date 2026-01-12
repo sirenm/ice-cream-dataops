@@ -53,6 +53,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Ignore .env in CI
+        run: rm -f .env || true
+
       - name: Verify and Update Toolkit Authorization
         run: yes | cdf auth verify
       - name: Build Toolkit Configurations
