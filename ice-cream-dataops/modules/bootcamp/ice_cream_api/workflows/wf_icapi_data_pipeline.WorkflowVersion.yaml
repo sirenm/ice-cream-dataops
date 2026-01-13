@@ -6,7 +6,7 @@ workflowDefinition:
     type: transformation
     parameters:
       transformation:
-            externalId: 'tr-create_asset_hierarchy'
+            externalId: 'create_asset_hierarchy'
             concurrencyPolicy: fail
     retries: 3
     timeout: 3600
